@@ -159,8 +159,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
                   className={`w-7 h-7 rounded text-[10px] font-bold transition-all cursor-pointer ${
                     selection.selectedVariationProductId ===
                     s.variation_product_id
-                      ? "bg-[#C1FF72] text-black"
-                      : "bg-white text-black hover:bg-zinc-300"
+                      ? "bg-[#372224] text-white"
+                      : "bg-white text-[#372224] hover:bg-zinc-300"
                   }`}
                 >
                   {s.size_name}
