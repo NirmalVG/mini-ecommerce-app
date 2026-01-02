@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 //@ts-ignore
 import "./globals.css"
-import CommonLayout from "@/layout/Commonlayout/CommonLayout"
+import CommonLayout from "@/layout/CommonLayout"
 
 const inter = Inter({
   variable: "--font-inter",
