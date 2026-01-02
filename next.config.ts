@@ -1,7 +1,26 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "skilltestnextjs.evidam.zybotechlab.com",
+        port: "",
+        pathname: "/media/**",
+      },
+    ],
+  },
 
-export default nextConfig;
+  async rewrites() {
+    return [
+      {
+        source: "/api/proxy/:path*",
+        destination:
+          "https://skilltestnextjs.evidam.zybotechlab.com/api/:path*/",
+      },
+    ]
+  },
+}
+
+export default nextConfig
