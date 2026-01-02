@@ -1,5 +1,7 @@
 # 👟 Nike Store - Next.js Auth & E-commerce Flow
 
+[![Vercel Deployment](https://img.shields.io/badge/deployed%20on-Vercel-black?logo=vercel)](https://mini-ecommerce-app-five.vercel.app)
+
 A high-performance, responsive e-commerce application built with **Next.js 16**, featuring a custom authentication flow, dynamic product management, and a secure checkout process.
 
 ---
