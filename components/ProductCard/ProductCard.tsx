@@ -49,15 +49,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   useEffect(() => {
     if (!selection) return
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         paused: true,
-        defaults: { ease: "power3.out", duration: 0.5 },
+        defaults: { ease: "power3.out", duration: 0.4 },
       })
 
-      tl.to(contentRef.current, {
-        y: -60,
-      })
+      tl.to(cardRef.current, { zIndex: 50, duration: 0 }) // Bring to front
+        .to(contentRef.current, { y: -60 })
         .to(
           revealRef.current,
           {
@@ -66,33 +66,30 @@ const ProductCard = ({ product }: ProductCardProps) => {
             duration: 0.6,
             ease: "expo.out",
           },
-          "-=0.4"
+          "-=0.3"
         )
         .fromTo(
           revealRef.current?.children || [],
-          { y: 30, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.4,
-            stagger: 0.08,
-            ease: "back.out(1.2)",
-          },
+          { y: 10, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.05 },
           "-=0.4"
         )
 
-      const play = () => tl.play()
-      const reverse = () => tl.reverse()
-      cardRef.current?.addEventListener("mouseenter", play)
-      cardRef.current?.addEventListener("mouseleave", reverse)
+      const handleEnter = () => tl.play()
+      const handleLeave = () => tl.reverse()
+
+      const card = cardRef.current
+      card?.addEventListener("mouseenter", handleEnter)
+      card?.addEventListener("mouseleave", handleLeave)
 
       return () => {
-        cardRef.current?.removeEventListener("mouseenter", play)
-        cardRef.current?.removeEventListener("mouseleave", reverse)
+        card?.removeEventListener("mouseenter", handleEnter)
+        card?.removeEventListener("mouseleave", handleLeave)
       }
     }, cardRef)
+
     return () => ctx.revert()
-  }, [selection])
+  }, [product.id])
 
   if (!selection) return null
 
@@ -127,7 +124,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </div>
       <div
         ref={revealRef}
-        className="absolute -bottom-45 left-0 right-0 px-6 flex flex-col gap-4 opacity-0 invisible z-30 py-6 bg-linear-to-t from-[#232323] via-[#232323]/90 to-transparent"
+        className="absolute -bottom-45 left-0 right-0 px-6 flex flex-col gap-4 opacity-0 invisible z-30 py-6 bg-[#232323]"
       >
         {activeVariation && (
           <div className="flex items-center justify-between">
@@ -137,6 +134,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <div className="flex gap-1">
               {activeVariation.sizes.map((s) => (
                 <button
+                  type="button"
                   key={s.variation_product_id}
                   onClick={(e) => {
                     e.stopPropagation()
@@ -167,6 +165,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               const firstSize = c.sizes[0]?.variation_product_id ?? null
               return (
                 <button
+                  type="button"
                   key={c.color_id}
                   onClick={(e) => {
                     e.stopPropagation()
