@@ -2,7 +2,7 @@ import OrderCard from "@/components/OrderCard/OrderCard"
 import { apiServerRequest } from "@/lib/api-server"
 import { OrderItem } from "@/types"
 
-export default async function OrdersPage() {
+export default async function ProfilePage() {
   const data = await apiServerRequest("/user-orders/")
   return (
     <section className="min-h-screen bg-[#161616]">

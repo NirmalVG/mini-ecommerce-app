@@ -1,27 +1,7 @@
-"use client"
-
 import { OrderProps } from "@/types"
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
 import Image from "next/image"
 
 const OrderDetailsCard = ({ order }: OrderProps) => {
-  const router = useRouter()
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push("/orders")
-    }, 5000)
-
-    return () => clearTimeout(timer)
-  }, [router])
-
-  if (!order) {
-    return (
-      <div className="text-white/30 italic py-4">Redirecting to orders...</div>
-    )
-  }
-
   return (
     <div className="w-full bg-[#292929] rounded-lg p-3 md:p-4 mb-6 md:mb-8 border border-gray-800">
       <div className="flex gap-3 md:gap-4 items-center">
