@@ -12,16 +12,13 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  // Zustand State
   const selection = useProductStore((state) => state.selections[product.id])
   const setSelection = useProductStore((state) => state.setSelection)
   const purchaseProduct = useProductStore((state) => state.purchaseProduct)
 
-  // Local UI State
   const [isHovered, setIsHovered] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  // Refs for GSAP
   const cardRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const revealRef = useRef<HTMLDivElement>(null)
@@ -40,7 +37,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
     return colors[colorName] || "bg-zinc-700"
   }
 
-  // Handle Initial Selection (Wait for hydration)
   useGSAP(() => {
     setMounted(true)
     if (useProductStore.getState().selections[product.id]) return
@@ -58,12 +54,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
     })
   }, [product.id])
 
-  // GSAP Animation Logic - This rebuilds every time the component mounts
   useGSAP(
     () => {
       if (!mounted) return
 
-      // Initialize/Reset timeline
       tl.current = gsap.timeline({
         paused: true,
         defaults: { ease: "power3.out", duration: 0.4 },
@@ -89,7 +83,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
           "-=0.4"
         )
 
-      // Cleanup ensures no memory leaks or stale refs when navigating away
       return () => {
         if (tl.current) tl.current.kill()
       }
@@ -97,7 +90,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
     { scope: cardRef, dependencies: [mounted, product.id] }
   )
 
-  // Trigger based on Hover State
   useGSAP(() => {
     if (isHovered) {
       tl.current?.play()
@@ -106,7 +98,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
     }
   }, [isHovered])
 
-  // Prevent Hydration Mismatch (Wait for Zustand Persist to load)
   if (!mounted || !selection) {
     return (
       <div className="h-101.25 w-78 bg-[#232323] animate-pulse rounded-lg" />
