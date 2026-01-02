@@ -12,7 +12,7 @@ export default async function OrdersPage() {
         </h1>
       </div>
 
-      <div className="max-w-4xl px-8">
+      <div className="max-w-4xl px-8 pb-8">
         <div className="flex flex-col gap-4">
           {data?.orders?.map((order: OrderItem) => (
             <OrderCard key={order?.order_id} order={order} />

@@ -127,7 +127,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </div>
       <div
         ref={revealRef}
-        className="absolute -bottom-45 left-0 right-0 px-6 flex flex-col gap-4 opacity-0 invisible z-30 py-6 bg-gradient-to-t from-[#232323] via-[#232323]/90 to-transparent"
+        className="absolute -bottom-45 left-0 right-0 px-6 flex flex-col gap-4 opacity-0 invisible z-30 py-6 bg-linear-to-t from-[#232323] via-[#232323]/90 to-transparent"
       >
         {activeVariation && (
           <div className="flex items-center justify-between">
