@@ -207,7 +207,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           disabled={
             selection.isVariantProduct && !selection.selectedVariationProductId
           }
-          className="w-full cursor-pointer bg-white text-black font-extrabold py-3 rounded-xl text-[14px] active:scale-95 transition-all shadow-2xl disabled:bg-zinc-600"
+          className="w-36 h-12 cursor-pointer bg-white text-black font-bold rounded-md text-[18px] transition-all hover:bg-gray-100 active:scale-95 disabled:bg-zinc-600 disabled:cursor-not-allowed shadow-md flex items-center justify-center mx-auto"
         >
           Buy Now
         </button>
