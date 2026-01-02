@@ -1,9 +1,13 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+
 import Image from "next/image"
+
 import gsap from "gsap"
+
 import { Product } from "@/types"
+
 import { useProductStore } from "@/store/useProductStore"
 
 interface ProductCardProps {
@@ -12,13 +16,16 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const selection = useProductStore((state) => state.selections[product.id])
+
   const setSelection = useProductStore((state) => state.setSelection)
+
   const purchaseProduct = useProductStore((state) => state.purchaseProduct)
 
   const cardRef = useRef<HTMLDivElement>(null)
+
   const contentRef = useRef<HTMLDivElement>(null)
+
   const revealRef = useRef<HTMLDivElement>(null)
-  const isOpenRef = useRef(false)
 
   const activeVariation = selection
     ? product.variation_colors?.[selection.selectedColorIndex]
@@ -27,19 +34,21 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const getEclipseClass = (colorName: string) => {
     const colors: Record<string, string> = {
       White: "bg-[#C1FF72]",
+
       Red: "bg-[#912C36]",
+
       Black: "bg-[#6B128A]",
     }
+
     return colors[colorName] || "bg-zinc-700"
   }
 
   useEffect(() => {
-    const store = useProductStore.getState()
-
-    if (store.selections[product.id]) return
+    if (useProductStore.getState().selections[product.id]) return
 
     if (!product.variation_colors?.length) {
       setSelection(product.id, { isVariantProduct: false })
+
       return
     }
 
@@ -48,75 +57,87 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
     setSelection(product.id, {
       selectedColorIndex: 0,
+
       selectedVariationProductId: firstSizeId,
+
       isVariantProduct: true,
     })
   }, [product.id, product.variation_colors, setSelection])
 
   useEffect(() => {
-    if (typeof window === "undefined") return
-    if (!cardRef.current || !contentRef.current || !revealRef.current) return
+    if (!selection) return
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         paused: true,
-        defaults: { ease: "power3.out", duration: 0.4 },
+
+        defaults: { ease: "power3.out", duration: 0.5 },
       })
 
-      tl.set(cardRef.current, { zIndex: 50 })
-        .to(contentRef.current, { y: -60 })
+      tl.to(contentRef.current, {
+        y: -60,
+      })
+
         .to(
           revealRef.current,
+
           {
             autoAlpha: 1,
+
             y: -180,
+
             duration: 0.6,
+
             ease: "expo.out",
           },
-          "-=0.3"
-        )
-        .fromTo(
-          revealRef.current!.children,
-          { y: 10, opacity: 0 },
-          { y: 0, opacity: 1, stagger: 0.05 },
+
           "-=0.4"
         )
 
-      const card = cardRef.current!
+        .fromTo(
+          revealRef.current?.children || [],
 
-      const handleEnter = () => {
-        if (isOpenRef.current) return
-        isOpenRef.current = true
-        tl.play()
-      }
+          { y: 30, opacity: 0 },
 
-      const handleLeave = (e: PointerEvent) => {
-        const related = e.relatedTarget as HTMLElement | null
+          {
+            y: 0,
 
-        if (card.contains(related)) return
+            opacity: 1,
 
-        isOpenRef.current = false
-        tl.reverse()
-      }
+            duration: 0.4,
 
-      card.addEventListener("pointerenter", handleEnter)
-      card.addEventListener("pointerleave", handleLeave)
+            stagger: 0.08,
+
+            ease: "back.out(1.2)",
+          },
+
+          "-=0.4"
+        )
+
+      const play = () => tl.play()
+
+      const reverse = () => tl.reverse()
+
+      cardRef.current?.addEventListener("mouseenter", play)
+
+      cardRef.current?.addEventListener("mouseleave", reverse)
 
       return () => {
-        card.removeEventListener("pointerenter", handleEnter)
-        card.removeEventListener("pointerleave", handleLeave)
+        cardRef.current?.removeEventListener("mouseenter", play)
+
+        cardRef.current?.removeEventListener("mouseleave", reverse)
       }
     }, cardRef)
 
     return () => ctx.revert()
-  }, [])
+  }, [selection])
 
   if (!selection) return null
 
   return (
     <div
       ref={cardRef}
-      className="relative isolate bg-[#232323] h-101.25 w-78 shrink-0 mb-10 flex flex-col overflow-hidden"
+      className="relative bg-[#232323] h-101.25 w-78 shrink-0 mb-10 flex flex-col  overflow-hidden"
     >
       <div
         ref={contentRef}
@@ -145,20 +166,21 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
       <div
         ref={revealRef}
-        className="absolute -bottom-45 left-0 right-0 px-6 flex flex-col gap-4 opacity-0 z-30 py-6 bg-[#232323]"
+        className="absolute -bottom-45 left-0 right-0 px-6 flex flex-col gap-4 opacity-0 invisible z-30 py-6 bg-linear-to-t from-[#232323] via-[#232323]/90 to-transparent"
       >
         {activeVariation && (
           <div className="flex items-center justify-between">
-            <span className="text-white font-medium text-[16px] uppercase">
+            <span className="text-white font-medium text-[16px] leading-[100%] tracking-[-0.04em] uppercase">
               Size:
             </span>
+
             <div className="flex gap-1">
               {activeVariation.sizes.map((s) => (
                 <button
                   key={s.variation_product_id}
-                  type="button"
                   onClick={(e) => {
                     e.stopPropagation()
+
                     setSelection(product.id, {
                       selectedVariationProductId: s.variation_product_id,
                     })
@@ -178,9 +200,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
         )}
 
         <div className="flex items-center justify-between">
-          <span className="text-white font-medium text-[16px] uppercase">
+          <span className="text-white font-medium text-[16px] leading-[100%] tracking-[-0.04em] uppercase">
             Color:
           </span>
+
           <div className="flex gap-2">
             {product.variation_colors.map((c, i) => {
               const firstSize = c.sizes[0]?.variation_product_id ?? null
@@ -188,11 +211,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
               return (
                 <button
                   key={c.color_id}
-                  type="button"
                   onClick={(e) => {
                     e.stopPropagation()
+
                     setSelection(product.id, {
                       selectedColorIndex: i,
+
                       selectedVariationProductId: firstSize,
                     })
                   }}
@@ -212,7 +236,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           disabled={
             selection.isVariantProduct && !selection.selectedVariationProductId
           }
-          className="w-full cursor-pointer bg-white text-black font-extrabold py-3 rounded-xl text-[14px] uppercase active:scale-95 transition-all shadow-2xl disabled:opacity-50"
+          className="w-full cursor-pointer bg-white text-black font-extrabold py-3 rounded-xl text-[14px] uppercase active:scale-95 transition-all shadow-2xl"
         >
           Buy Now
         </button>
