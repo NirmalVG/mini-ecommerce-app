@@ -1,13 +1,10 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-
+import { useRef, useState } from "react"
 import Image from "next/image"
-
 import gsap from "gsap"
-
+import { useGSAP } from "@gsap/react"
 import { Product } from "@/types"
-
 import { useProductStore } from "@/store/useProductStore"
 
 interface ProductCardProps {
@@ -15,17 +12,20 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  // Zustand State
   const selection = useProductStore((state) => state.selections[product.id])
-
   const setSelection = useProductStore((state) => state.setSelection)
-
   const purchaseProduct = useProductStore((state) => state.purchaseProduct)
 
+  // Local UI State
+  const [isHovered, setIsHovered] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Refs for GSAP
   const cardRef = useRef<HTMLDivElement>(null)
-
   const contentRef = useRef<HTMLDivElement>(null)
-
   const revealRef = useRef<HTMLDivElement>(null)
+  const tl = useRef<gsap.core.Timeline | null>(null)
 
   const activeVariation = selection
     ? product.variation_colors?.[selection.selectedColorIndex]
@@ -34,110 +34,91 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const getEclipseClass = (colorName: string) => {
     const colors: Record<string, string> = {
       White: "bg-[#C1FF72]",
-
       Red: "bg-[#912C36]",
-
       Black: "bg-[#6B128A]",
     }
-
     return colors[colorName] || "bg-zinc-700"
   }
 
-  useEffect(() => {
+  // Handle Initial Selection (Wait for hydration)
+  useGSAP(() => {
+    setMounted(true)
     if (useProductStore.getState().selections[product.id]) return
 
     if (!product.variation_colors?.length) {
       setSelection(product.id, { isVariantProduct: false })
-
       return
     }
-
     const firstSizeId =
       product.variation_colors[0]?.sizes?.[0]?.variation_product_id ?? null
-
     setSelection(product.id, {
       selectedColorIndex: 0,
-
       selectedVariationProductId: firstSizeId,
-
       isVariantProduct: true,
     })
-  }, [product.id, product.variation_colors, setSelection])
+  }, [product.id])
 
-  useEffect(() => {
-    if (!selection) return
+  // GSAP Animation Logic - This rebuilds every time the component mounts
+  useGSAP(
+    () => {
+      if (!mounted) return
 
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
+      // Initialize/Reset timeline
+      tl.current = gsap.timeline({
         paused: true,
-
-        defaults: { ease: "power3.out", duration: 0.5 },
+        defaults: { ease: "power3.out", duration: 0.4 },
       })
 
-      tl.to(contentRef.current, {
-        y: -60,
-      })
-
+      tl.current
+        .to(cardRef.current, { zIndex: 50, duration: 0 })
+        .to(contentRef.current, { y: -60 })
         .to(
           revealRef.current,
-
           {
             autoAlpha: 1,
-
             y: -180,
-
             duration: 0.6,
-
             ease: "expo.out",
           },
-
-          "-=0.4"
+          "-=0.3"
         )
-
         .fromTo(
           revealRef.current?.children || [],
-
-          { y: 30, opacity: 0 },
-
-          {
-            y: 0,
-
-            opacity: 1,
-
-            duration: 0.4,
-
-            stagger: 0.08,
-
-            ease: "back.out(1.2)",
-          },
-
+          { y: 15, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.05, ease: "back.out(1.7)" },
           "-=0.4"
         )
 
-      const play = () => tl.play()
-
-      const reverse = () => tl.reverse()
-
-      cardRef.current?.addEventListener("mouseenter", play)
-
-      cardRef.current?.addEventListener("mouseleave", reverse)
-
+      // Cleanup ensures no memory leaks or stale refs when navigating away
       return () => {
-        cardRef.current?.removeEventListener("mouseenter", play)
-
-        cardRef.current?.removeEventListener("mouseleave", reverse)
+        if (tl.current) tl.current.kill()
       }
-    }, cardRef)
+    },
+    { scope: cardRef, dependencies: [mounted, product.id] }
+  )
 
-    return () => ctx.revert()
-  }, [selection])
+  // Trigger based on Hover State
+  useGSAP(() => {
+    if (isHovered) {
+      tl.current?.play()
+    } else {
+      tl.current?.reverse()
+    }
+  }, [isHovered])
 
-  if (!selection) return null
+  // Prevent Hydration Mismatch (Wait for Zustand Persist to load)
+  if (!mounted || !selection) {
+    return (
+      <div className="h-101.25 w-78 bg-[#232323] animate-pulse rounded-lg" />
+    )
+  }
 
   return (
     <div
       ref={cardRef}
-      className="relative bg-[#232323] h-101.25 w-78 shrink-0 mb-10 flex flex-col  overflow-hidden"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative bg-[#232323] h-101.25 w-78 shrink-0 mb-10 flex flex-col overflow-hidden"
     >
       <div
         ref={contentRef}
@@ -158,29 +139,28 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <div className="relative z-10 mt-54">
-          <p className="text-white font-extrabold text-[20px] leading-[100%] tracking-[-0.03em] text-center">
-            {product.name.toUpperCase()}
+          <p className="text-white font-extrabold text-[20px] leading-[100%] tracking-[-0.03em] text-center uppercase">
+            {product.name}
           </p>
         </div>
       </div>
 
       <div
         ref={revealRef}
-        className="absolute -bottom-45 left-0 right-0 px-6 flex flex-col gap-4 opacity-0 invisible z-30 py-6 bg-linear-to-t from-[#232323] via-[#232323]/90 to-transparent"
+        className="absolute -bottom-45 left-0 right-0 px-6 flex flex-col gap-4 opacity-0 z-30 py-6 bg-[#232323]"
       >
         {activeVariation && (
           <div className="flex items-center justify-between">
-            <span className="text-white font-medium text-[16px] leading-[100%] tracking-[-0.04em] uppercase">
+            <span className="text-white font-medium text-[16px] uppercase">
               Size:
             </span>
-
             <div className="flex gap-1">
               {activeVariation.sizes.map((s) => (
                 <button
                   key={s.variation_product_id}
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation()
-
                     setSelection(product.id, {
                       selectedVariationProductId: s.variation_product_id,
                     })
@@ -188,8 +168,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
                   className={`w-7 h-7 rounded text-[10px] font-bold transition-all cursor-pointer ${
                     selection.selectedVariationProductId ===
                     s.variation_product_id
-                      ? "bg-[#372224] text-white"
-                      : "bg-white text-[#372224] hover:bg-[#ddd]"
+                      ? "bg-[#C1FF72] text-black"
+                      : "bg-white text-black hover:bg-zinc-300"
                   }`}
                 >
                   {s.size_name}
@@ -200,23 +180,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
         )}
 
         <div className="flex items-center justify-between">
-          <span className="text-white font-medium text-[16px] leading-[100%] tracking-[-0.04em] uppercase">
+          <span className="text-white font-medium text-[16px] uppercase">
             Color:
           </span>
-
           <div className="flex gap-2">
             {product.variation_colors.map((c, i) => {
               const firstSize = c.sizes[0]?.variation_product_id ?? null
-
               return (
                 <button
                   key={c.color_id}
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation()
-
                     setSelection(product.id, {
                       selectedColorIndex: i,
-
                       selectedVariationProductId: firstSize,
                     })
                   }}
@@ -232,11 +209,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <button
-          onClick={() => purchaseProduct(product.id)}
+          onClick={(e) => {
+            e.stopPropagation()
+            purchaseProduct(product.id)
+          }}
           disabled={
             selection.isVariantProduct && !selection.selectedVariationProductId
           }
-          className="w-full cursor-pointer bg-white text-black font-extrabold py-3 rounded-xl text-[14px] uppercase active:scale-95 transition-all shadow-2xl"
+          className="w-full cursor-pointer bg-white text-black font-extrabold py-3 rounded-xl text-[14px] uppercase active:scale-95 transition-all shadow-2xl disabled:bg-zinc-600"
         >
           Buy Now
         </button>
