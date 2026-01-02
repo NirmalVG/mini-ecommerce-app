@@ -48,15 +48,17 @@ const ProductCard = ({ product }: ProductCardProps) => {
   }, [product.id, product.variation_colors, setSelection])
 
   useEffect(() => {
-    if (!selection) return
-
+    // Use useLayoutEffect if you want to prevent flickering,
+    // but useEffect is safer for standard Next.js deployments.
     const ctx = gsap.context(() => {
+      if (!cardRef.current) return
+
       const tl = gsap.timeline({
         paused: true,
         defaults: { ease: "power3.out", duration: 0.4 },
       })
 
-      tl.to(cardRef.current, { zIndex: 50, duration: 0 }) // Bring to front
+      tl.to(cardRef.current, { zIndex: 50, duration: 0 })
         .to(contentRef.current, { y: -60 })
         .to(
           revealRef.current,
@@ -68,24 +70,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
           },
           "-=0.3"
         )
-        .fromTo(
-          revealRef.current?.children || [],
-          { y: 10, opacity: 0 },
-          { y: 0, opacity: 1, stagger: 0.05 },
-          "-=0.4"
-        )
 
-      const handleEnter = () => tl.play()
-      const handleLeave = () => tl.reverse()
+      const play = () => tl.play()
+      const reverse = () => tl.reverse()
 
-      const card = cardRef.current
-      card?.addEventListener("mouseenter", handleEnter)
-      card?.addEventListener("mouseleave", handleLeave)
-
-      return () => {
-        card?.removeEventListener("mouseenter", handleEnter)
-        card?.removeEventListener("mouseleave", handleLeave)
-      }
+      cardRef.current.addEventListener("mouseenter", play)
+      cardRef.current.addEventListener("mouseleave", reverse)
     }, cardRef)
 
     return () => ctx.revert()
