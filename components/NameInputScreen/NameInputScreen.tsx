@@ -71,6 +71,7 @@ const NameInputScreen = () => {
             rounded-lg
             hover:bg-gray-100
             transition-colors
+            cursor-pointer
           "
         >
           {isLoading ? "Saving..." : "Continue"}

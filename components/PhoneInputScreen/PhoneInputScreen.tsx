@@ -66,6 +66,7 @@ const PhoneInputScreen = () => {
             rounded-lg
             hover:bg-gray-100
             transition-colors
+            cursor-pointer
           "
           onClick={requestOtp}
           disabled={isLoading}

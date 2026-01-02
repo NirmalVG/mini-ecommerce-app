@@ -144,7 +144,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                       selectedVariationProductId: s.variation_product_id,
                     })
                   }}
-                  className={`w-7 h-7 rounded text-[10px] font-bold transition-all ${
+                  className={`w-7 h-7 rounded text-[10px] font-bold transition-all cursor-pointer ${
                     selection.selectedVariationProductId ===
                     s.variation_product_id
                       ? "bg-[#372224] text-white"
@@ -175,7 +175,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                       selectedVariationProductId: firstSize,
                     })
                   }}
-                  className={`w-4 h-4 rounded-full border-2 transition-transform ${
+                  className={`w-4 h-4 rounded-full border-2 transition-transform cursor-pointer ${
                     selection.selectedColorIndex === i
                       ? "border-white scale-125"
                       : "border-transparent"
@@ -191,7 +191,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           disabled={
             selection.isVariantProduct && !selection.selectedVariationProductId
           }
-          className="w-full bg-white text-black font-extrabold py-3 rounded-xl text-[14px] uppercase active:scale-95 transition-all shadow-2xl"
+          className="w-full cursor-pointer bg-white text-black font-extrabold py-3 rounded-xl text-[14px] uppercase active:scale-95 transition-all shadow-2xl"
         >
           Buy Now
         </button>

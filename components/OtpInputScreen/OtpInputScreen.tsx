@@ -3,6 +3,7 @@
 import { Pencil } from "lucide-react"
 import { useAuthStore } from "@/store/useAuthStore"
 import { useEffect } from "react"
+import { Button } from "../ui/button"
 
 const OtpInputScreen = () => {
   const {
@@ -42,12 +43,12 @@ const OtpInputScreen = () => {
 
       <p className="text-white text-xs md:text-sm text-center mb-8 md:mb-12 flex items-center justify-center gap-2">
         Enter the OTP sent to {phoneNumber}
-        <button
+        <Button
           onClick={() => setStep("phone")}
-          className="p-1 hover:bg-white/10 rounded-full transition-colors"
+          className="p-1 hover:bg-white/10 bg-black rounded-full transition-colors cursor-pointer"
         >
           <Pencil size={14} className="opacity-60" />
-        </button>
+        </Button>
       </p>
 
       <div className="space-y-6 md:space-y-8">
@@ -89,12 +90,12 @@ const OtpInputScreen = () => {
                 <span className="text-white font-semibold">{seconds}s</span>
               </>
             ) : (
-              <button
+              <Button
                 onClick={requestOtp}
-                className="text-white font-semibold hover:underline"
+                className="text-white font-semibold hover:underline bg-black hover:bg-black cursor-pointer"
               >
                 Resend OTP
-              </button>
+              </Button>
             )}
           </p>
 
@@ -112,6 +113,7 @@ const OtpInputScreen = () => {
               hover:bg-gray-100
               transition-colors
               disabled:bg-gray-400
+              cursor-pointer
             "
           >
             {isLoading ? "Verifying..." : "Verify"}

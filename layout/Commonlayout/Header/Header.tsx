@@ -26,7 +26,7 @@ const Header = () => {
       <div className="flex items-center gap-4">
         <Button
           onClick={handleLogout}
-          className="cursor-pointer bg-transparent hover:bg-white/5 text-white flex gap-2 items-center h-10 px-4"
+          className="cursor-pointer bg-transparent hover:bg-[#191919] text-white flex gap-2 items-center h-10 px-4"
         >
           <CircleUserRound size={20} className="text-white" />
           <span className="font-medium">Log Out</span>
