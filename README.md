@@ -39,3 +39,51 @@ A high-performance, responsive e-commerce application built with **Next.js 16**,
 ├── types/                # TypeScript interfaces and shared types
 └── proxy.ts              # Global route protection logic
 ```
+
+## ⚙️ Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone [https://github.com/your-username/nike-store-app.git](https://github.com/your-username/nike-store-app.git)
+cd nike-store-app
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Set up Environment Variables
+
+Create a `.env.local` file in the root directory and add your backend URL:
+
+```env
+NEXT_PUBLIC_API_URL=your_api_endpoint_here
+```
+
+### 4. Run the development server
+
+```bash
+npm run dev
+```
+
+## 🔒 Authentication & Middleware
+
+The application is secured using a `middleware.ts` file that intercepts requests to manage sessions:
+
+- **Public Routes**: `/login` is accessible to everyone. If an authenticated user attempts to access `/login`, they are automatically redirected to `/product-list`.
+- **Protected Routes**: All other routes (Product List, Success, etc.) require a valid `auth_token` cookie. Unauthorized users are redirected to the login page.
+
+## 📦 API Integration
+
+The following endpoints are integrated into the **Zustand** stores for seamless state management:
+
+| Method   | Endpoint             | Description                                                 |
+| :------- | :------------------- | :---------------------------------------------------------- |
+| **POST** | `/request-otp/`      | Sends a 4-digit code to the user's phone number.            |
+| **POST** | `/verify/`           | Validates the OTP and sets the `auth_token` session cookie. |
+| **POST** | `/login-register/`   | Handles user profile creation/name registration.            |
+| **POST** | `/purchase-product/` | Processes orders for specific products or variants.         |
+| **GET**  | `/user-orders/`      | Retrieves the authenticated user's full order history.      |
