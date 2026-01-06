@@ -21,7 +21,7 @@ const Header = async () => {
       </Link>
 
       <div className="flex items-center gap-4">
-        {isAuthenticated ? (
+        {isAuthenticated && (
           <div className="flex items-center">
             <Link href="/profile" className="text-white">
               <CircleUserRound
@@ -31,12 +31,6 @@ const Header = async () => {
             </Link>
             <LogoutButton />
           </div>
-        ) : (
-          <Link href="/login">
-            <Button className="cursor-pointer bg-transparent hover:bg-[#191919] text-white flex gap-2 items-center h-10 px-4">
-              <span className="font-medium">Log In</span>
-            </Button>
-          </Link>
         )}
       </div>
     </header>
