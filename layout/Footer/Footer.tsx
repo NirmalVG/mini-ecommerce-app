@@ -6,7 +6,7 @@ import Link from "next/link"
 
 const Footer = () => {
   return (
-    <footer className="bg-black h-61 flex items-center justify-between container mx-auto px-8">
+    <footer className="bg-[#1B1B1B] md:bg-black h-61 flex items-center justify-between container mx-auto px-8">
       <Link href="/product-list">
         <Image
           src="/images/logo.png"
@@ -16,7 +16,8 @@ const Footer = () => {
           priority
         />
       </Link>
-      <div className="flex items-center justify-between gap-8">
+
+      <div className="flex items-center gap-8">
         <Link
           href="https://www.facebook.com/nike/"
           target="_blank"
@@ -24,6 +25,7 @@ const Footer = () => {
         >
           <LuFacebook color="#ffffff" size={22} />
         </Link>
+
         <Link
           href="https://www.instagram.com/nike/?hl=en"
           target="_blank"
@@ -31,6 +33,7 @@ const Footer = () => {
         >
           <FaInstagram color="#ffffff" size={22} />
         </Link>
+
         <Link
           href="https://x.com/Nike"
           target="_blank"

@@ -4,7 +4,8 @@ import Image from "next/image"
 export default function LoginPage() {
   return (
     <section className="grid grid-cols-1 md:grid-cols-2 min-h-[calc(100vh-70px)]">
-      <div className="relative w-full h-full min-h-100">
+      {/* Banner image — hidden on mobile */}
+      <div className="relative hidden md:block w-full h-full min-h-100">
         <Image
           src="/images/login-banner.webp"
           alt="Banner"
@@ -15,7 +16,12 @@ export default function LoginPage() {
         />
       </div>
 
-      <div className="flex items-center justify-center bg-black p-15">
+      {/* Login section */}
+      <div
+        className="flex bg-black p-15
+                      justify-center
+                      items-start md:items-center"
+      >
         <Login />
       </div>
     </section>
